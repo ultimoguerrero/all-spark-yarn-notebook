@@ -55,8 +55,9 @@ RUN pip install jupyter_dashboards faker && \
     pip install setuptools && \
     pip install pyhive thrift sasl thrift_sasl faker && \
     pip install toree && \
-    /usr/bin/pip install setuptools && \
-    /usr/bin/pip install pydoop
+    pip install pyhdfs snakebite
+    #/usr/bin/pip install setuptools && \
+    #/usr/bin/pip install pydoop
     #pip2 install pyhive pydoop thrift sasl thrift_sasl faker
 
 USER root
