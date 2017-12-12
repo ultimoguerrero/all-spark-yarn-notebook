@@ -9,6 +9,7 @@ ENV HADOOP_CONF_DIR  /usr/local/hadoop-2.6.5/etc/hadoop
 USER root
 # Add proper open-jdk-8 not just the jre, needed for pydoop
 RUN apt-get -y update && \
+    apt-get install --no-install-recommends -y krb5-user libpam-krb5 libpam-ccreds auth-client-config && \
     apt-get install --no-install-recommends  -y openjdk-8-jdk python python-pip openssl && \
    # rm /etc/apt/sources.list.d/jessie-backports.list && \
     apt-get clean && \
@@ -53,6 +54,7 @@ RUN pip install jupyter_dashboards faker && \
     jupyter dashboards quick-setup --sys-prefix && \
     pip install setuptools && \
     pip install pyhive thrift sasl thrift_sasl faker && \
+    pip install toree && \
     /usr/bin/pip install setuptools && \
     /usr/bin/pip install pydoop
     #pip2 install pyhive pydoop thrift sasl thrift_sasl faker
