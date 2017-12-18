@@ -7,7 +7,7 @@ ENV HADOOP_CONF_HOME /usr/local/hadoop-2.6.5/etc/hadoop
 ENV HADOOP_CONF_DIR  /usr/local/hadoop-2.6.5/etc/hadoop
 
 ENV PYSPARK_DRIVER_PYTHON "jupyter"
-ENV PYSPARK_DRIVER_PYTHON_OPTS "notebook"
+ENV PYSPARK_DRIVER_PYTHON_OPTS "notebook --allow-root"
 
 USER root
 # Add proper open-jdk-8 not just the jre, needed for pydoop

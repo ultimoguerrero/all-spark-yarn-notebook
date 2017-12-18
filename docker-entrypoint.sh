@@ -9,4 +9,4 @@
 #
 # ===========================================================
 
-PYSPARK_DRIVER_PYTHON="jupyter" PYSPARK_DRIVER_PYTHON_OPT="notebook" $SPARK_HOME/bin/pyspark
+PYSPARK_DRIVER_PYTHON="jupyter" PYSPARK_DRIVER_PYTHON_OPT="notebook --allow-root" $SPARK_HOME/bin/pyspark --queue HighPool --master yarn-client --num-executors 2 --executor-cores 2 --executor-memory 16G --driver-memory 16G --conf spark.yarn.executor.memoryOverhead=4G
