@@ -1,10 +1,13 @@
-FROM sporadic/all-spark-notebook
+FROM jupyter/all-spark-notebook
 
 # Set env vars for pydoop
 ENV HADOOP_HOME /usr/local/hadoop-2.6.5
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 ENV HADOOP_CONF_HOME /usr/local/hadoop-2.6.5/etc/hadoop
 ENV HADOOP_CONF_DIR  /usr/local/hadoop-2.6.5/etc/hadoop
+
+ENV PYSPARK_DRIVER_PYTHON "jupyter"
+ENV PYSPARK_DRIVER_PYTHON_OPTS "notebook"
 
 USER root
 # Add proper open-jdk-8 not just the jre, needed for pydoop
@@ -34,8 +37,8 @@ COPY hadoop-conf/ /usr/local/hadoop-2.6.5/etc/hadoop/
 
 
 # Spark-Submit doesn't work unless I set the following
-RUN echo "spark.driver.extraJavaOptions -Dhdp.version=2.5.3.0-37" >> /usr/local/spark/conf/spark-defaults.conf  && \
-    echo "spark.yarn.am.extraJavaOptions -Dhdp.version=2.5.3.0-37" >> /usr/local/spark/conf/spark-defaults.conf && \
+RUN echo "spark.driver.extraJavaOptions -Dhdp.version=2.6.5" >> /usr/local/spark/conf/spark-defaults.conf  && \
+    echo "spark.yarn.am.extraJavaOptions -Dhdp.version=2.6.5" >> /usr/local/spark/conf/spark-defaults.conf && \
     echo "spark.master=yarn" >>  /usr/local/spark/conf/spark-defaults.conf && \
     echo "spark.hadoop.yarn.timeline-service.enabled=false" >> /usr/local/spark/conf/spark-defaults.conf && \
     chown -R $NB_USER:users /usr/local/spark/conf/spark-defaults.conf && \
@@ -50,9 +53,12 @@ USER $NB_USER
 # - Dashboards
 # - PyDoop
 # - PyHive
-RUN pip install jupyter_dashboards faker && \
+RUN pip install --upgrade pip && \
+    pip install jupyter_dashboards faker && \
     jupyter dashboards quick-setup --sys-prefix && \
-    pip install setuptools && \
+    pip install setuptools virtualenv && \
+    pip install gssapi && \
+    pip install krbcontext --use-wheel && \
     pip install pyhive thrift sasl thrift_sasl faker && \
     pip install toree && \
     pip install pyhdfs snakebite
@@ -60,7 +66,16 @@ RUN pip install jupyter_dashboards faker && \
     #/usr/bin/pip install pydoop
     #pip2 install pyhive pydoop thrift sasl thrift_sasl faker
 
+#RUN conda install krb5 -c conda-forge
+
+RUN conda install hdfs3 -c conda-forge
+RUN conda install knit -c conda-forge
+
 USER root
+COPY docker-entrypoint.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Ensure we overwrite the kernel config so that toree connects to cluster
-RUN jupyter toree install --sys-prefix --spark_opts="--master yarn --deploy-mode client --driver-memory 512m  --executor-memory 512m  --executor-cores 1 --driver-java-options -Dhdp.version=2.5.3.0-37 --conf spark.hadoop.yarn.timeline-service.enabled=false"
+ENTRYPOINT ["docker-entrypoint.sh"]
+
 USER $NB_USER
